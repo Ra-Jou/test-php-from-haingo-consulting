@@ -1,7 +1,7 @@
 <?php include "db.php"; ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
@@ -11,50 +11,69 @@
 </head>
 
 <body>
+    <br><br><br>
     <main class="container">
-        <h1>Liste des clients</h1>
+        <a href="ajouter-client.php">Ajouter un client</a> |
+        <a href="ajouter-application.php">Ajouter un établissement</a> |
+        <a href="associer-client.php">Associer un client à un établissement</a>
+
         <hr>
-        <a href="ajouter-client.php"> Ajouter un client</a>
-        |
-        <a href="associer-client.php"> Associer un client a etablissement</a>
-        <br><br>
+
+        <h1>Liste des clients</h1>
+
         <table>
             <thead>
                 <tr>
                     <th>Client</th>
-                    <th>Telephone</th>
+                    <th>Téléphone</th>
                     <th>Email</th>
-                    <th>Application</th>
+                    <th>Établissements</th>
                 </tr>
             </thead>
+
             <tbody>
                 <?php
-                $res_clients = pg_query($conn, "SELECT * FROM clients WHERE cliesupp = 2");
-                while ($c = pg_fetch_assoc($res_clients)):
+                $res_clients = pg_query($conn, "
+                    SELECT clienum, clienom, clieprenom, clietel1, clieadresmail
+                    FROM clients
+                    WHERE cliesupp = 2
+                    ORDER BY clienom ASC
+                ");
+
+                while ($c = pg_fetch_assoc($res_clients)) :
                 ?>
                     <tr>
-                        <td><?= $c['clienom'] . " " . $c['clieprenom']  ?> </td>
-                        <td><?= $c['clietel1'] ?> </td>
-                        <td><?= $c['clieadresmail'] ?> </td>
+                        <td><?= htmlspecialchars($c['clienom'] . ' ' . $c['clieprenom']) ?></td>
+                        <td><?= htmlspecialchars($c['clietel1']) ?></td>
+                        <td><?= htmlspecialchars($c['clieadresmail']) ?></td>
+
                         <td>
                             <?php
                             $sql_apps = "
-                                    SELECT a.appnom, a.appnometablissement
-                                    FROM applications a
-                                    JOIN clients_applications ca ON a.appnum = ca.appnum
-                                    WHERE ca.clienum = " . $c['clienum'];
-                            $res_apps = pg_query($conn, $sql_apps);
-                            while ($app = pg_fetch_assoc($res_apps)) {
-                                echo "• <italic>" . $app['appnom'] . "</italic> (" . $app['appnometablissement'] . ")<br>";
-                            }
+                                SELECT a.appnometablissement, a.appversion
+                                FROM client_application ca
+                                JOIN applications a ON a.appnum = ca.appnum
+                                WHERE ca.clienum = " . intval($c['clienum']);
 
+                            $res_apps = pg_query($conn, $sql_apps);
+
+                            if (pg_num_rows($res_apps) === 0) {
+                                echo "<em>Aucun établissement</em>";
+                            } else {
+                                while ($app = pg_fetch_assoc($res_apps)) {
+                                    echo "• <strong>" . htmlspecialchars($app['appnometablissement']) . "</strong>";
+                                    echo " (version : " . htmlspecialchars($app['appversion']) . ")<br>";
+                                }
+                            }
                             ?>
                         </td>
                     </tr>
-                <?php endwhile ?>
+                <?php endwhile; ?>
             </tbody>
         </table>
+
     </main>
+
 </body>
 
 </html>

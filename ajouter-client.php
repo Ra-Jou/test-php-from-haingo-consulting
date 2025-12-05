@@ -21,12 +21,19 @@ if (!empty($_POST)) {
 
 <head>
     <meta charset="utf-8">
-    <title>Haingo consulting | Associer client</title>
+    <title>Haingo consulting | Ajouter client</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+    <br><br><br>
     <main class="container">
+        <a href="index.php"> Accueil</a>
+        |
+        <a href="ajouter-application.php"> Ajouter un etablissement</a>
+        |
+        <a href="associer-client.php"> Associer un client à un etablissement</a>
+        <hr>
         <h2>Ajouter un client</h2>
         <form method="POST">
             <label>Nom :
