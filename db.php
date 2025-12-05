@@ -1,6 +1,6 @@
 <?php
 
-$hot = "localhost";
+$host = "localhost";
 $user = "joary";
 $port = "5432";
 $pass = "root";
